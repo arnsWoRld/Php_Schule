@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "tut gehn"
+AuthUserFile c:\xampp\htdocs\Php_Schule\admin\.htpasswd
+Require valid-user
