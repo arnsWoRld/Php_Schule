@@ -11,6 +11,12 @@ if (isset($_POST["commit"])) {
     $userAdmin = $_POST["UserAdmin"];
     $passwordAdmin = $_POST["PassAdmin"];
 }
+if (!isset($user)) {
+            echo "Achtung, dieses Programm sollte nur ueber das Programm 'install.php' gestartet werden. <br>";
+            echo "Programm wird nun beendet.";
+            exit(1);
+        }
+
 ?>
 <html>
     <head>
@@ -31,7 +37,7 @@ if (isset($_POST["commit"])) {
         echo "<br> User Admin = " . $userAdmin;
         echo "<br> Passwort Admin = " . $passwordAdmin;
 
-        echo "<br> <br> 1) Klasse fuer Verbindung zur Datenbank wird erstellt ...";
+        echo "<br> <br> 1) Klasse fuer Verbindung zur Datenbank wird erstellt ... " ;
 
         //<!-- ACHTUNG Dateiname muss fuer Wirkbetrieb noch geaendert werden ... ohne auto -->
 
@@ -76,16 +82,16 @@ if (isset($_POST["commit"])) {
         echo "<br> <br> 3) Datenbank wird in MySQL angelegt ...";
         $conn = new mysqli($adress, $user, $password, "mysql");
         if ($conn->connect_errno) {
-            echo "Fehler beim Verbinden zu MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
+            echo "<br>!!! Fehler beim Verbinden zu MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
             exit(1);
         }
-        echo "    ... Verbindung zu MySQL hergestellt via: " . $conn->host_info . "<br>";
+        echo "<br>    ... Verbindung zu MySQL hergestellt via: " . $conn->host_info . "<br>";
 
         $sql = "CREATE DATABASE " . $dbName;
         if ($conn->query($sql) === TRUE) {
             echo "    ... Datenbank erfolgreich angelegt." . "<br>";
         } else {
-            echo "    ... Fehler beim anlegen der Datenbank: " . $conn->error . "<br>";
+            echo "    !!! Fehler beim anlegen der Datenbank: " . $conn->error . "<br>";
             exit(1);
         }
         $conn->close();
@@ -94,34 +100,118 @@ if (isset($_POST["commit"])) {
         echo "<br> <br> 4) Tabellen werden in der Datenbank angelegt ...";
         $connMyCMS = new mysqli($adress, $user, $password, $dbName);
         if ($connMyCMS->connect_errno) {
-            echo "    ... Fehler beim Verbinden zu MySQL-myCMS: (" . $connMyCMS->connect_errno . ") " . $connMyCMS->connect_error . "<br>";
+            echo "<br>    !!! Fehler beim Verbinden zu MySQL-myCMS: (" . $connMyCMS->connect_errno . ") " . $connMyCMS->connect_error . "<br>";
             exit(1);
         }
-        echo "    ... Verbindung zu myCMS in MySQL hergestellt via: " . $connMyCMS->host_info . "<br>";
+        echo "<br>    ... Verbindung zu myCMS in MySQL hergestellt via: " . $connMyCMS->host_info . "<br>";
 
-        // alles nachfolgende ist falsch, keine Ahnung wie die DB aussehen soll ...
-        if (!$connMyCMS->query("DROP TABLE IF EXISTS content") ||
-                !$connMyCMS->query("CREATE TABLE content(ContentID INT UNSIGNED PRIMARY KEY, ContentLink VARCHAR(30), ContentInhalt VARCHAR(255), LastModified TIMESTAMP DEFAULT CURRENT_TIMESTAMP, deleteFlag TINYINT DEFAULT 0)") ||
-                !$connMyCMS->query("INSERT INTO content(ContentID, ContentLink, ContentInhalt) VALUES (1, 'TestLink 1', '11111 Inhalt Test Link 1')")) {
-            echo "    ... Tabelle content konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `cms_settings`") ||
+                !$connMyCMS->query("CREATE TABLE `cms_settings`("
+                        ."`property` varchar(255) NOT NULL PRIMARY KEY, "
+                        ."`value` varchar(255) DEFAULT NULL)") ) {
+            echo "    !!! Tabelle cms_settings konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
             exit(1);
         }
-        if (!$connMyCMS->query("DROP TABLE IF EXISTS template") ||
-                !$connMyCMS->query("CREATE TABLE template(TemplateID INT UNSIGNED PRIMARY KEY, TemplateBezeichnung VARCHAR(50), deleteFlag TINYINT DEFAULT 0, LastModified TIMESTAMP DEFAULT CURRENT_TIMESTAMP)") ||
-                !$connMyCMS->query("INSERT INTO template(TemplateID, TemplateBezeichnung) VALUES (1, 'default')")) {
-            echo "    ... Tabelle template konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `cms_user`") ||
+                !$connMyCMS->query("CREATE TABLE `cms_user` ("
+                        ."`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        ."`name` VARCHAR(50) NOT NULL, "
+                        ."`password` VARCHAR(100) NOT NULL)") ) {
+            echo "    !!! Tabelle cms_user konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
             exit(1);
         }
-        if (!$connMyCMS->query("DROP TABLE IF EXISTS tvalues") ||
-                !$connMyCMS->query("CREATE TABLE tvalues(TemplateID INT UNSIGNED, SettingID INT UNSIGNED, value VARCHAR(50), LastModified TIMESTAMP DEFAULT CURRENT_TIMESTAMP)") ||
-                !$connMyCMS->query("INSERT INTO tvalues(TemplateID, SettingID, value) VALUES (1, 1, '700')")) {
-            echo "   ... Tabelle tvalues konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `content`") ||
+                !$connMyCMS->query("CREATE TABLE `content` ("
+                        ."`CID` INT(11) UNSIGNED NOT NULL PRIMARY KEY, "
+                        ."`CLongText` VARCHAR(1024) NOT NULL, "
+                        ."`CName` VARCHAR(50) DEFAULT NULL, "
+                        ."`LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                        ."`deleteFlag` TINYINT(1) DEFAULT NULL)") ) {
+            echo "   !!! Tabelle content konnte nicht angelegt werden: (" . $connMyCMS->errno . ") <br> " . $connMyCMS->error . "<br>" .$connMyCMS->connect_error;
             exit(1);
         }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `mainmenu`") ||
+                !$connMyCMS->query("CREATE TABLE `mainmenu`("
+                        . "`MmID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        . "`MmName` VARCHAR(50) NOT NULL)") ){
+            echo "   !!! Tabelle mainmenu konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `template`") ||
+                !$connMyCMS->query("CREATE TABLE `template`("
+                        . "`TemplateID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        . "`TemplateBezeichnung` VARCHAR(50) NOT NULL, "
+                        . "`LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                        . "`deleteFlag` TINYINT(1) DEFAULT NULL)") ){
+            echo "   !!! Tabelle template konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `templatesetting`") ||
+                !$connMyCMS->query("CREATE TABLE `templatesetting`("
+                        . "`SettingID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        . "`SettingLabel` VARCHAR(50) DEFAULT NULL, "
+                        . "`SettingEinheit` VARCHAR(15) DEFAULT NULL, "
+                        . "`LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                        . "`deleteFlag` TINYINT(1) DEFAULT NULL)") ){
+            echo "   !!! Tabelle templatesetting konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `settingtemplatevalue`") ||
+                !$connMyCMS->query("CREATE TABLE `settingtemplatevalue`("
+                        ."`TemplateID` INT(11) UNSIGNED NOT NULL, "
+                        ."`SettingID` INT(11) UNSIGNED NOT NULL, "
+                        ."`value` VARCHAR(50) DEFAULT NULL, "
+                        ."KEY `settingtemplatevalue_templatesetting` (`SettingID`), "
+                        ."KEY `settingtemplatevalue_template` (`TemplateID`), "
+                        ."CONSTRAINT `settingtemplatevalue_template` FOREIGN KEY (`TemplateID`) REFERENCES `template` (`TemplateID`), "
+                        ."CONSTRAINT `settingtemplatevalue_templatesetting` FOREIGN KEY (`SettingID`) REFERENCES `templatesetting` (`SettingID`))")  ){
+            echo "   !!! Tabelle settingtemplatevalue konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS `submenu`") ||
+                !$connMyCMS->query("CREATE TABLE `submenu`("
+                        ."`SmID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        ."`MmID` INT(11) UNSIGNED NOT NULL, "
+                        ."`SmName` VARCHAR(50) DEFAULT NULL, "
+                        ."KEY `FK_submenu_mainmenu` (`MmID`), "
+                        ."CONSTRAINT `FK_submenu_mainmenu` FOREIGN KEY (`MmID`) REFERENCES `mainmenu` (`MmID`) )") ){
+            echo "   !!! Tabelle submenu konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        if (!$connMyCMS->query("DROP TABLE IF EXISTS subcont") ||
+                !$connMyCMS->query("CREATE TABLE subcont("
+                        ."SCID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, "
+                        ."CID INT(11) UNSIGNED NOT NULL, "
+                        ."SmID INT(11) UNSIGNED NOT NULL, "
+                        ."rank INT(11) UNSIGNED DEFAULT NULL, "
+                        ."KEY `FK__content` (`CID`), "
+                        ."KEY `FK__submenu` (`SmID`), "
+                        ."CONSTRAINT `FK__content` FOREIGN KEY (`CID`) REFERENCES `content` (`CID`), "
+                        ."CONSTRAINT `FK__submenu` FOREIGN KEY (`SmID`) REFERENCES `submenu` (`SmID`))") ){
+            echo "   !!! Tabelle subcont konnte nicht angelegt werden: (" . $connMyCMS->errno . ") " . $connMyCMS->error . "<br>";
+            exit(1);
+        }
+        echo "    ... erledigt! ";
+
+        echo "<br> <br> 5) Musterdaten werden in die Tabellen eingefuegt ...";
+        $connMyCMS->query("INSERT INTO content (CID, CLongText, CName) VALUES (null, 'Dies ist ein langer Text mit sehr intaeressanten Inhalten', 'TagesNews')");
+        $connMyCMS->query("INSERT INTO cms_user (id, name, password) VALUES (null, 'admin', '21232f297a57a5a743894a0e4a801fc3')");
+        $connMyCMS->query("INSERT INTO mainmenu VALUES (null, 'Hauptmenue')");
+        $connMyCMS->query("INSERT INTO template (`TemplateBezeichnung`) VALUES ('default')");
+        $connMyCMS->query("INSERT INTO templatesetting (`SettingLabel`, `SettingEinheit`) VALUES "
+                . "('tableWidth', 'px'), "
+                . "('headerHight', 'px'), "
+                . "('footerHight', 'px'), "
+                . "('menuWidth', 'percent'), "
+                . "('tableBorder', 'px') " );
+        $connMyCMS->query("INSERT INTO settingtemplatevalue VALUES (1, 1, '1050')");
+        $connMyCMS->query("INSERT INTO submenu VALUES (null, 1, 'Admin')");
+        $connMyCMS->query("INSERT INTO subcont VALUES (null, 1, 1, null)");
+
         $connMyCMS->close();
         echo "    ... erledigt! ";
 
-        echo "<br> <br> 5) Diese Funktion wird unkenntlich gemacht ...";
+        echo "<br> <br> 6) Diese Funktion wird unkenntlich gemacht ...";
         //<!-- ACHTUNG Dateiname muss fuer Wirkbetrieb noch geaendert werden ... ohne auto -->
         $myfile3 = fopen("auto_install.php", "w") or die("Kann Datei -install.php- nicht erstellen!");
         $txt = "<html> <head> <title>Dummy Install</title></head> \r\n";
