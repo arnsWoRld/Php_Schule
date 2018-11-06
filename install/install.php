@@ -11,7 +11,7 @@ session_start();
     <meta charset="UTF-8" />
     <meta http-equiv="expires" content="0" />
     <meta name="author" content="Martin Lesch" />
-    <meta name="date" content="2018-03-11T23:49:37+02:00" />
+    <meta name="date" content="2018-63-11T23:19:37+02:00" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="description" content="Installation MeinCMS Schulprojekt VIF4." />
     <meta name="keywords" lang="de" content="HTML, PHP, VIF4, MeinCMS, Installation, BBS2, LeerMartin Lesch, Deutsch" />
@@ -45,12 +45,10 @@ session_start();
                 <thead bgcolor="yellow"> <!-- Tabellenkopf beginnt -->
                     <tr> 
                         <th>  
-                            Start erfolgte:
+                            Angaben fuer MySQL
                         </th>
                         <th>
-                            <?php
-                            echo date("h.m.s") . " Uhr";
-                            ?>
+                            Ihre Eingaben
                         </th>
                     </tr>
                 </thead>
@@ -107,40 +105,38 @@ session_start();
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <font color="red">
-                            <br> 
-                            </font>
-                        </td>
-                        <td>
-                            <br>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <font color="red">
-                            Benutzername Admin: &nbsp;
-                            </font>
-                        </td>
-                        <td>
-                            <input Type="text" name="UserAdmin" placeholder="admin" required> <br>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <font color="red">
-                            Passwort Admin: &nbsp;
-                            </font>
-                        </td>
-                        <td>
-                            <input Type="password" name="PassAdmin" pattern=".{6,}" title="Mindestens 6-stellig" placeholder="geheim" required> <br>
-                        </td>
-                    </tr>
+                        <td bgcolor="yellow">
+                <center><b> Angaben fuer .htpasswd (Admin)</b></center>
+                </td>
+                <td bgcolor="yellow">
+                    <br>
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                        <font color="red">
+                        Benutzername Admin: &nbsp;
+                        </font>
+                    </td>
+                    <td>
+                        <input Type="text" name="UserAdmin" placeholder="admin" required> <br>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <font color="red">
+                        Passwort Admin: &nbsp;
+                        </font>
+                    </td>
+                    <td>
+                        <input Type="password" name="PassAdmin" pattern=".{6,}" title="Mindestens 6-stellig" placeholder="geheim" required> <br>
+                    </td>
+                </tr>
                 </tbody>
             </table>
             <br>
             <input Type="submit" name="commit" value="Installation starten - los geht's">
-            </center>
         </form>
-    </body>
+    </center>
+</body>
 </html>
