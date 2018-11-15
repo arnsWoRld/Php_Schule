@@ -1,91 +1,86 @@
-<?php
 
-//require("dbConnect.php");
+<!DOCTYPE html>
+<?php
 
 class TemplateManager {
 
-    public $name = "";
-    public $sql = "";
+    private $actualTemplate = "default";
     private $mysqli;
+    private $templateSettingsAssocArr;
 
     public function __construct($mysqli) {
 
-        // wichtig Übergabe an Konstruktor OOP
-        // keine Übergabe von Params; !Global Variable - unsauber
         $this->mysqli = $mysqli;
+        $this->setTemplateSetting();
     }
 
-    public function getsqlvif4() {
+    public function getActualTemplate() {
+        return $this->actualTemplate;
+    }
 
-        $sql = "select * from settingtemplatevalue 
-                left join template on settingtemplatevalue.TemplateID = Template.TemplateID
-                left join templatesetting on templatesetting.SettingID = settingtemplatevalue.SettingID";
+    public function getActualTemplateID() {
 
-        $sql = "select * from vif4";
 
-        return $sql;
+        if (!$resultTemplate = $this->mysqli->query("SELECT TemplateID From template WHERE TemplateBezeichnung='" . $this->getActualTemplate() . "';")) {
+            printf("Errormessage: %s\n", $mysqli->error);
+        } else {
+            return $resultTemplate->fetch_object()->TemplateID;
+            
+        }
+    }
+
+    public function setTemplateSetting() {
+
+
+        $resultSetting = $this->mysqli->query(
+                "SELECT templatesetting.SettingLabel,settingtemplatevalue.Value "
+                . "FROM settingtemplatevalue "
+                . "LEFT JOIN template "
+                . "ON settingtemplatevalue.TemplateID=template.TemplateID "
+                . "LEFT JOIN templatesetting "
+                . "ON templatesetting.SettingID=settingtemplatevalue.SettingID "
+                . "WHERE settingtemplatevalue.TemplateID=" . $this->getActualTemplateID() . ";");
+
+
+
+        /*
+          $resultSetting = $this->mysqli->query(
+          "SELECT templatesetting.SettingLabel,settingtemplatevalue.Value "
+          . "FROM settingtemplatevalue "
+          . "LEFT JOIN template "
+          . "ON settingtemplatevalue.TemplateID=template.TemplateID "
+          . "LEFT JOIN templatesetting "
+          . "ON templatesetting.SettingID=settingtemplatevalue.SettingID "
+          . "WHERE settingtemplatevalue.TemplateID=2");
+
+         */
+
+        $settingValues = array();
+        while ($rowSetting = $resultSetting->fetch_assoc()) {
+            $settingValues[$rowSetting["SettingLabel"]] = $rowSetting["Value"];
+        }
+        $this->templateSettingsAssocArr = $settingValues;
     }
 
     public function getTableWidth() {
 
-        // Statement einfügen 
-
-        return $this->templatesettings["TableWidth"];
+        //return $this-> setTemplateSetting("tableWidth");
+        //return $this-> setTemplateSetting["tableWidth"];
+        //return $this->setTemplateSetting("tableWidth");
+        //return $this->templateSetting("tableWidth");
+        return $this->templateSettingsAssocArr["tableWidth"];
     }
 
     public function getMenuWidth() {
-
-        // Statement einfügen 
-
-        return $this->templatesettings["MenuWidth"];
+        return $this->templateSettingsAssocArr["menuWidth"];
     }
 
     public function getHeaderHeight() {
-
-        //$sql = "Select * from vif4";
-//        $sql = "select * from settingtemplatevalue 
-//        left join template on settingtemplatevalue.TemplateID = Template.TemplateID
-//        left join templatesetting on templatesetting.SettingID = settingtemplatevalue.SettingID";
-        //echo $sql;
-
-
-        $sql = "SELECT * FROM settingtemplatevalue";
-//      //  $db_erg = mysqli_query($this->mysqli, $sql);
-//
-//        if (!$db_erg) {
-//            die('Ungültige Abfrage: ' . mysqli_error());
-//        }
-//        
-//        echo '<table border="1">';
-//        while ($zeile = mysqli_fetch_array($db_erg, MYSQL_ASSOC)) {
-//            echo "<tr>";
-//            //echo "<td>" . $zeile['TemplateID'] . "</td>";
-//            //echo "<td>" . $zeile['SettingID'] . "</td>";
-//            echo "<td>" . $zeile['Value'] . "</td>";
-//            echo "</tr>";
-//        }
-//        echo "</table>";
-        
-        //das wieder rein
-//        $result = mysqli_query($this->mysqli, $sql);
-//        if (!$result) {
-//            die('Error in SQL:' . mysql_error());
-//        } else {
-//            while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
-//                printf("TemplateID: %s  SettingID: %s", $row[0], $row[1]);
-//            }
-//            mysql_free_result($result);
-//
-//            // mysqli_free_result($db_erg);
-//            // Statement einfügen 
-//            //return $this->templatesettings["getHeaderHeight"];
-//            return $sql;
-//        }
-//
-//        function getStatement($param) {
-//            $this->name = "nein";
-//        }
-
-        //im admin ht access einfügen      
+        return $this->templateSettingsAssocArr["headerHeight"];
     }
+
+    public function getFooterHeight() {
+        return $this->templateSettingsAssocArr["footerHeight"];
+    }
+
 }
