@@ -87,6 +87,18 @@ if (!isset($user)) {
         }
         echo "<br>    ... Verbindung zu MySQL hergestellt via: " . $conn->host_info . "<br>";
 
+        $sqlData = file_get_contents('meincms.sql');
+        $sqlDataArr = explode(';', $sqlData);
+        foreach ($sqlDataArr as $query) {
+            if ($query) {
+                $conn->query($query);
+                    if ($conn->errno) {
+                        echo "<br>     ... Fehler bei ausfuehren dieser Abfrage: " .$query ." <br>";
+                        echo "         ... Fehlermeldung:  " .$conn->error ." <br>";
+                }
+            }
+        }
+/*        
         $sql = "CREATE DATABASE " . $dbName;
         if ($conn->query($sql) === TRUE) {
             echo "    ... Datenbank erfolgreich angelegt." . "<br>";
@@ -193,25 +205,25 @@ if (!isset($user)) {
         }
         echo "    ... erledigt! ";
 
-        echo "<br> <br> 5) Musterdaten werden in die Tabellen eingefuegt ...";
-        $connMyCMS->query("INSERT INTO content (CID, CLongText, CName) VALUES (null, 'Dies ist ein langer Text mit sehr intaeressanten Inhalten', 'TagesNews')");
-        $connMyCMS->query("INSERT INTO cms_user (id, name, password) VALUES (null, 'admin', '21232f297a57a5a743894a0e4a801fc3')");
-        $connMyCMS->query("INSERT INTO mainmenu VALUES (null, 'Hauptmenue')");
-        $connMyCMS->query("INSERT INTO template (`TemplateBezeichnung`) VALUES ('default')");
-        $connMyCMS->query("INSERT INTO templatesetting (`SettingLabel`, `SettingEinheit`) VALUES "
+        echo "<br> <br> 4) Musterdaten werden in die Tabellen eingefuegt ...";
+        $conn->query("INSERT INTO content (CID, CLongText, CName) VALUES (null, 'Dies ist ein langer Text mit sehr intaeressanten Inhalten', 'TagesNews')");
+        $conn->query("INSERT INTO cms_user (id, name, password) VALUES (null, 'admin', '21232f297a57a5a743894a0e4a801fc3')");
+        $conn->query("INSERT INTO mainmenu VALUES (null, 'Hauptmenue')");
+        $conn->query("INSERT INTO template (`TemplateBezeichnung`) VALUES ('default')");
+        $conn->query("INSERT INTO templatesetting (`SettingLabel`, `SettingEinheit`) VALUES "
                 . "('tableWidth', 'px'), "
                 . "('headerHight', 'px'), "
                 . "('footerHight', 'px'), "
                 . "('menuWidth', 'percent'), "
                 . "('tableBorder', 'px') " );
-        $connMyCMS->query("INSERT INTO settingtemplatevalue VALUES (1, 1, '1050')");
-        $connMyCMS->query("INSERT INTO submenu VALUES (null, 1, 'Admin')");
-        $connMyCMS->query("INSERT INTO subcont VALUES (null, 1, 1, null)");
-
-        $connMyCMS->close();
+        $conn->query("INSERT INTO settingtemplatevalue VALUES (1, 1, '1050')");
+        $conn->query("INSERT INTO submenu VALUES (null, 1, 'Admin')");
+        $conn->query("INSERT INTO subcont VALUES (null, 1, 1, null)");
+*/
+        $conn->close();
         echo "    ... erledigt! ";
 
-        echo "<br> <br> 6) Diese Funktion wird unkenntlich gemacht ...";
+        echo "<br> <br> 4) Diese Funktion wird unkenntlich gemacht ...";
         //<!-- ACHTUNG Dateiname muss fuer Wirkbetrieb noch geaendert werden ... ohne auto -->
         $myfile3 = fopen("auto_install.php", "w") or die("Kann Datei -install.php- nicht erstellen!");
         $txt = "<html> <head> <title>Dummy Install</title></head> \r\n";

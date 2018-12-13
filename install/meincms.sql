@@ -19,7 +19,7 @@ USE `cms`;
 CREATE TABLE IF NOT EXISTS `content` (
   `CID` int(11) NOT NULL AUTO_INCREMENT,
   `CLongText` varchar(1024) NOT NULL,
-  `LastModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   `CName` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`CID`)
@@ -38,7 +38,7 @@ INSERT INTO `content` (`CID`, `CLongText`, `LastModified`, `Delete`, `CName`) VA
 CREATE TABLE IF NOT EXISTS `mainmenu` (
   `MmID` int(11) NOT NULL AUTO_INCREMENT,
   `MmName` varchar(50) DEFAULT '0',
-  `LastModified` datetime DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`MmID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `settingtemplatevalue` (
   `TemplateID` int(11) DEFAULT NULL,
   `SettingID` int(11) DEFAULT NULL,
   `Value` varchar(50) DEFAULT NULL,
-  `LastModified` datetime DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   KEY `settingtemplatevalue_templatesetting` (`SettingID`),
   KEY `settingtemplatevalue_template` (`TemplateID`),
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `submenu` (
   `SmID` int(11) NOT NULL AUTO_INCREMENT,
   `MmID` int(11) DEFAULT NULL,
   `SmName` varchar(50) DEFAULT '0',
-  `LastModified` datetime DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`SmID`),
   KEY `FK_submenu_mainmenu` (`MmID`),
@@ -123,7 +123,7 @@ INSERT INTO `submenu` (`SmID`, `MmID`, `SmName`, `LastModified`, `Delete`) VALUE
 CREATE TABLE IF NOT EXISTS `template` (
   `TemplateID` int(11) NOT NULL AUTO_INCREMENT,
   `TemplateBezeichnung` varchar(50) NOT NULL,
-  `LastModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`TemplateID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `templatesetting` (
   `SettingID` int(11) NOT NULL AUTO_INCREMENT,
   `SettingLabel` varchar(50) DEFAULT NULL,
   `SettingEinheit` varchar(15) DEFAULT NULL,
-  `LastModified` datetime DEFAULT CURRENT_TIMESTAMP,
+  `LastModified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `Delete` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`SettingID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
