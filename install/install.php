@@ -101,7 +101,7 @@ session_start();
                             </font>
                         </td>
                         <td>
-                            <input Type="text" name="DbNameSQL" placeholder="MyCMS" required> <br>
+                            <input Type="text" name="DbNameSQL" placeholder="cms" required> <br>
                         </td>
                     </tr>
                     <tr>
